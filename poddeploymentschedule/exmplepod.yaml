@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: high-priority-pod
+spec:
+  priorityClassName: system-services
+  containers:
+    - name: busybox
+      image: busybox
+      command: ["sleep", "3600"]
+      resources: 
+        request: 
+          cpu: 1024m
+          memory: 2048Mi
+        limits: 
+          cpu: 1024m
+          memory: 2048Mi

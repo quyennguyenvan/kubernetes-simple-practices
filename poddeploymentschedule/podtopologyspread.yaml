@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: nginx
+  name: web-app
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 2 # allow a maximum imbalance of 2 pod between zones
+          topologyKey: "topology.kubernetes.io/region"
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: web-app
+      containers:
+        - name: web-app
+          image: nginx:latest
+          resources: 
+            requests: 
+              cpu: 128m
+              memory: 256Mi
+            limits: 
+              cpu: 128m
+              memory: 256Mi

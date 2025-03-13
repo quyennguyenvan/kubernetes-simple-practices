@@ -1,0 +1,61 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name:  apphz
+  namespace: nginx
+  labels:
+    name:  apphz
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector: 
+    matchLabels:
+      name:  apphz
+  template:
+    metadata:
+      labels:
+        name:  apphz
+    spec:
+      containers:
+      - image: quyencl91/appheathcheck:7
+        name:  apphz
+        resources:
+          requests:
+            cpu: "20m"
+            memory: "55M"
+          limits: 
+            cpu: "512m"
+            memory: "1024M"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 3
+        env:
+        - name: IS_READY
+          value: "true"    
+        - name: IS_STARTED
+          value: "true"   
+        ports:
+        - containerPort:  5000
+          name:  apphz
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      volumes:
+        - name: data
+          emptyDir: {}
